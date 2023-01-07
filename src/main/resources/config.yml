@@ -36,4 +36,4 @@ actions:
 #消息
 message:
   enter: "&f您已进入列车"
-  leave: "&f您已退出列车"
+  exit: "&f您已退出列车"
