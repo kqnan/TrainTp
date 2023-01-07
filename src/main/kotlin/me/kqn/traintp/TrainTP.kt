@@ -101,7 +101,7 @@ object TrainTP : Plugin() {
                         var interv= config.getInterval()
                         trainScheduler= TrainScheduler(interv, config.getArea("trainLoc")!!, Pair(config.getArea("pos1")!!, config.getArea("pos2")!!), config.getBroacast_Timing(),broacstInterval=config.getBroadcastInterval(),config.getBroacast_range(), config.getBroacast_message())
                         trainScheduler!!.run()
-                        debug("下一次列车将在${interv}分钟后到来")
+                        sender.sendMessage("开始运行，下一次列车将在${interv}分钟后到来")
 
                     }
                 }

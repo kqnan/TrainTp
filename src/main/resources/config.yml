@@ -12,20 +12,28 @@ broadcast-Timing: 30
 #向周围半径50格的玩家发送通知
 broadcast-range: 50
 #发送的广播的具体内容
-broadcast-message: "&a请注意，下一趟列车将在30秒后到达"
+broadcast-message: "&a请注意，下一趟列车将在%sec%秒后到达"
 #发送广播的时间间隔,单位：秒
 broadcast-interval: 5
 
 #列车的原理图列表。每次列车到来时，插件将从下表抽取一个列车的原理图来生成。
-trains-schematics:
-  - "train1.schematic"
+trains-schematics: []
 
+#是否开启debug模式，控制台和聊天栏会有更多输出信息
+debug: false
 
 #列车出发后运行的命令，一般是把玩家传送到不同地方。不要加/
 commands:
-  - "warp 1-A"
+  - "warp test"
   - "spawn"
+
+#未实现的功能
+actions:
+  #玩家进入列车时执行的动作
+  enter: ""
+  #玩家离开列车时执行的动作
+  leave: ""
 #消息
 message:
-  enter: "&f您已进入列车，列车将在%sec%秒后启动"
+  enter: "&f您已进入列车"
   leave: "&f您已退出列车"

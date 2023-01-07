@@ -68,6 +68,8 @@ object SchemaCreator {
                var dir=File("plugins/TrainTP/schematic")
                if(!dir.exists())dir.mkdir()
                var file = File("plugins/TrainTP/schematic/${name}.schematic")
+               file.deleteOnExit()
+
                ClipboardFormat.SCHEMATIC.getWriter(FileOutputStream(file))
                var writer=ClipboardFormat.SCHEMATIC.getWriter(FileOutputStream(file))
                writer.write(clipboard,BukkitWorld(min.world).worldData)

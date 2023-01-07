@@ -22,6 +22,12 @@ class Config {
     fun save(){
         config.saveToFile(File("plugins/TrainTP/config.yml"))
     }
+    fun getDebug():Boolean{
+        return config.getBoolean("debug",false)
+    }
+    fun getAction(key:String):String{
+        return config.getString("actions.$key","")!!
+    }
     fun getArea(key:String): Location? {
         var loc=config.getLocation("area.$key")
         if(loc==null)return null
@@ -74,7 +80,11 @@ class Config {
             getBroacast_Timing()
             getBroacast_range()
             getBroacast_message()
-            getTrains_schemas()
+            config.getStringList("trains-schematics").forEach {
+                if(!File("plugins/TrainTP/schematic/${it}").exists()){
+                    return false
+                }
+            }
             getCommands()
             for (key in config.getConfigurationSection("message")!!.getKeys(false)) {
                 getMessage(key)

@@ -163,6 +163,7 @@ fun parse_schema(world: World, schema: File,stage:State.Stage):State?{
 
 }
 fun debug(msg:String){
+    if(!TrainTP.config.getDebug())return
     print(msg)
     Bukkit.getOperators().forEach {
        it.player?.sendMessage(msg)
