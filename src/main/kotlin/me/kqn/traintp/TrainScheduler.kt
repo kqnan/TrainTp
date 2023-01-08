@@ -1,20 +1,20 @@
 package me.kqn.traintp
 
+import com.sk89q.worldedit.regions.Region
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitScheduler
 import org.bukkit.scheduler.BukkitTask
-import org.bukkit.util.BoundingBox
-import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.submitAsync
-import taboolib.common.platform.service.PlatformExecutor
+import taboolib.common.util.random
 import taboolib.common.util.sync
 import taboolib.common5.Baffle
 import taboolib.module.chat.colored
 import taboolib.module.effect.Circle
+import taboolib.module.effect.Line
 import taboolib.module.effect.ParticleSpawner
 import taboolib.platform.BukkitAdapter
 import java.io.File
@@ -34,15 +34,20 @@ class TrainScheduler {
     var task:BukkitTask?=null
     var effectTask:BukkitTask?=null
     var isStop=false
-    val baffle:Baffle;
+    val baffle1min:Baffle;
+    val baffle15s:Baffle
+    var cmd:Config.Cmd?=null
+    var baffleSound:Baffle
     constructor(interval: Int,trainLoc: Location,trainArea:Pair<Location,Location>,broacastTiming:Int,broacstInterval:Int,range:Double,message:String){
         this.interval=interval
-        this.baffle=Baffle.of(broacstInterval.toLong(),TimeUnit.SECONDS)
+        this.baffle1min=Baffle.of(60,TimeUnit.SECONDS)
         this.trainLoc=trainLoc
         this.trainArea=trainArea
         this.broacastTiming=broacastTiming
         this.range=range
+        this.baffleSound=Baffle.of(15,TimeUnit.SECONDS)
         this.message=message
+        baffle15s=Baffle.of(15,TimeUnit.SECONDS)
         state= State(null,null,null,null,null,null,State.Stage.COOLDOWN)
     }
     companion object{
@@ -65,6 +70,16 @@ class TrainScheduler {
                 circle.show()
             }
         }
+        fun lineEffect(pos1:Location,pos2:Location,particle: Particle){
+            var particleSpawner=object :ParticleSpawner{
+                override fun spawn(location: taboolib.common.util.Location) {
+                    var loc=BukkitAdapter().platformLocation(location) as Location
+                    loc.world!!.spawnParticle(particle,loc,1)
+                }
+            }
+            var line= Line(BukkitAdapter().adaptLocation(pos1),BukkitAdapter().adaptLocation(pos2),particleSpawner)
+            line.show()
+        }
     }
     fun runEffect(){
         effectTask=Bukkit.getScheduler().runTaskTimerAsynchronously(TrainTP.plugin, Runnable {
@@ -79,14 +94,16 @@ class TrainScheduler {
 
         },0,5)
     }
+
     fun stop(){
         isStop=true
         task?.cancel()
         effectTask?.cancel()
-        baffle.reset()
+        baffle1min.reset()
+        baffle15s.reset()
     }
     fun run (){
-        runEffect()
+        //runEffect()
         t0=System.currentTimeMillis()
         task=Bukkit.getScheduler().runTaskAsynchronously(TrainTP.plugin, Runnable{
             while (true) {
@@ -98,6 +115,10 @@ class TrainScheduler {
                 //到了指定时间
                 if (System.currentTimeMillis() - t0 >= interval * 60 * 1000) {
                     var schema = File(TrainTP.config.getTrains_schemas())
+                    cmd = TrainTP.config.getCommands()
+                    if(random(0,100)<=cmd!!.chance){
+                        cmd!!.isCall=true
+                    }
                     try {
                         debug("解析点位")
                         state=parse_schema2(trainLoc.world!!, schema, State.Stage.WAITING)!!//把所有点位解析出来
@@ -115,25 +136,26 @@ class TrainScheduler {
                     delay(30 * 1000)//30秒后开车
                     //上车玩家执行命令
                     debug("执行命令")
-                    var cmd = TrainTP.config.getCommands()
-                    debug(cmd)
+
+                    debug(cmd!!.cmd)
+
                     onTrainPlayers.forEach {
-                        performCommand(it , false, cmd)
+                        performCommand(it , false, cmd!!.cmd)
                     }
                     debug("恢复主城")
                     //2秒后恢复主城原来的样子
-                    submitAsync(delay = 40) {
-                        undo(world = trainLoc.world!!)
-                        state.stage=State.Stage.COOLDOWN
-                        state.enterPoint?.clear()
-                        state.exitPoint?.clear()
-                        state.leavePoint?.clear()
-                        state.insidePoint?.clear()
-
-                        onTrainPlayers.clear()
-                        interval=TrainTP.config.getInterval()
-                        debug("下一次列车将在${interval}分钟后到来")
-                    }
+                    undo(world = trainLoc.world!!)
+                    particle_schema(world = trainLoc.world!!,schema)
+                    state.stage=State.Stage.COOLDOWN
+                    state.enterPoint?.clear()
+                    state.exitPoint?.clear()
+                    state.leavePoint?.clear()
+                    state.insidePoint?.clear()
+                    onTrainPlayers.clear()
+                    debug("下一次列车将在${interval}分钟后到来")
+                    interval=TrainTP.config.getInterval()
+                    baffle1min.resetAll()
+                    baffle15s.resetAll()
                     t0 = System.currentTimeMillis()//重置时间
                 }
                 //没到时间
@@ -149,20 +171,38 @@ class TrainScheduler {
         })
 
     }
+    val soundtiming= arrayOf(60,45,30,15)
     //判断是否需要广播并广播
     fun shouldBroacast(){
         //离开车剩下30秒时，通知附近玩家上车
+        var remain=-(System.currentTimeMillis()-t0)+interval*60*1000
+        if(remain>60*1000)//剩余时间大于1分钟
+        {
+            if(baffle1min.hasNext()){
+                baffle1min.next()
+                val players= sync { trainLoc.world!!.getNearbyEntities(trainLoc,range,range,range) }//主线程获取玩家
 
-        if(System.currentTimeMillis()-t0>=interval*60*1000-broacastTiming*1000&&baffle.hasNext()){
-            baffle.next()
-            val players= sync { trainLoc.world!!.getNearbyEntities(trainLoc,range,range,range) }//主线程获取玩家
+                players.removeIf(){it.type!=EntityType.PLAYER}
+                val msg=interval*60-(System.currentTimeMillis()-t0)/1000
+                players.forEach {
+                    it.sendMessage(message.replace("%sec%",msg.toString()).colored())//广播消息
+                }
 
-            players.removeIf(){it.type!=EntityType.PLAYER}
-            val msg=interval*60-(System.currentTimeMillis()-t0)/1000
-            players.forEach {
-                it.sendMessage(message.replace("%sec%",msg.toString()).colored())//广播消息
             }
+        }
+        else {
+            if(baffle15s.hasNext()){
+                baffle15s.next()
+                val players= sync { trainLoc.world!!.getNearbyEntities(trainLoc,range,range,range) }//主线程获取玩家
 
+                players.removeIf(){it.type!=EntityType.PLAYER}
+                val msg=interval*60-(System.currentTimeMillis()-t0)/1000
+                players.forEach {
+                    (it as Player).playSound(it.location,Sound.ENTITY_MINECART_INSIDE,100f,100f)
+                    (it as Player).playSound(it.location,Sound.ENTITY_MINECART_RIDING,100f,100f)
+                    it.sendMessage(message.replace("%sec%",msg.toString()).colored())//广播消息
+                }
+            }
         }
 
     }

@@ -3,6 +3,7 @@ package me.kqn.traintp
 import org.bukkit.event.player.PlayerMoveEvent
 import  taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.common.util.random
 
 object TrainListener {
     var msg1="进入车厢"
@@ -22,6 +23,9 @@ object TrainListener {
                     if(TrainTP.trainScheduler!!.state.insidePoint!!.size==0)return
                     event.player.teleport(TrainTP.trainScheduler!!.state.insidePoint!!.random().clone().add(0.0,1.0,0.0))//随机传送到一个车厢
                     event.player.sendMessage(TrainTP.config.getMessage("enter"))
+                    if(TrainTP.trainScheduler!!.cmd!!.isCall==true){
+                        event.player.sendTitle(TrainTP.trainScheduler!!.cmd!!.message,null)
+                    }
                     TrainTP.trainScheduler?.onTrainPlayers?.add(event.player)
                     break
                 }

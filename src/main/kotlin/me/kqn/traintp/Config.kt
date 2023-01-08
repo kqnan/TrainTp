@@ -63,8 +63,17 @@ class Config {
         debug("本次列车是：$name")
         return name
     }
-    fun getCommands():String{
-        return config.getStringList("commands").random()
+    data class Cmd(val cmd:String,val chance:Int,val message:String){
+        var isCall:Boolean?=false
+    }
+    fun getCommands():Cmd{
+        var list=ArrayList<Cmd>()
+        var cfg=config.getConfigurationSection("commands")!!
+        for (key in cfg.getKeys(false)) {
+            list.add(Cmd(cfg.getString("${key}.cmd","")!!,cfg.getInt("${key}.chance",100),cfg.getStringColored("${key}.message")!!))
+        }
+
+        return list.random()
     }
     fun getMessage(key:String):String{
 

@@ -24,8 +24,14 @@ debug: false
 
 #列车出发后运行的命令，一般是把玩家传送到不同地方。不要加/
 commands:
-  - "warp test"
-  - "spawn"
+  1:
+    message: "提示:本次列车将到达雪原"
+    cmd: "warp test"
+    chance: 10  #有10%概率发送提示消息
+  2:
+    message: "提示：本次列车将到达主城"
+    cmd: "spawn"
+    chance: 100
 
 #未实现的功能
 actions:

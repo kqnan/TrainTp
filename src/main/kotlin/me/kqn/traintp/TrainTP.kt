@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -22,6 +23,7 @@ import taboolib.platform.BukkitPlugin
 import java.io.File
 
 object TrainTP : Plugin() {
+
     lateinit var config:Config
     var trainScheduler:TrainScheduler ?=null
     lateinit var plugin:JavaPlugin
@@ -29,6 +31,8 @@ object TrainTP : Plugin() {
         config= Config()
         registerCommand()
         plugin=BukkitPlugin.getInstance()
+        var p=Bukkit.getPlayer("Kurt_Kong")!!
+
 
     }
 

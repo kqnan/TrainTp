@@ -19,11 +19,9 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat
 import com.sk89q.worldedit.function.operation.Operations
 import com.sk89q.worldedit.internal.gson.internal.bind.ReflectiveTypeAdapterFactory.Adapter
 import com.sk89q.worldedit.regions.CuboidRegion
+import com.sk89q.worldedit.regions.Region
 import com.sk89q.worldedit.session.ClipboardHolder
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.block.data.type.Sign
 import org.bukkit.entity.Player
 import org.bukkit.event.block.SignChangeEvent
@@ -170,6 +168,25 @@ fun debug(msg:String){
     }
 }
 var editSession:EditSession?=null
+fun Vector.toBukkit(world: World):Location{
+    return Location(world,this.x,this.y,this.z)
+}
+fun particle_schema(world: World,schema: File){
+
+    val weWorld = BukkitWorld(world)
+    val clipboard: BlockArrayClipboard
+    val file = schema
+    if (!file.exists()) return
+    val format = ClipboardFormat.findByFile(file)
+    try {
+        val reader = format!!.getReader(FileInputStream(file))
+        clipboard = reader.read(weWorld.worldData) as BlockArrayClipboard
+        TrainScheduler.lineEffect(clipboard.region.minimumPoint.toBukkit(world),clipboard.region.maximumPoint.toBukkit(world), Particle.SMOKE_LARGE)
+    }catch (e:java.lang.Exception){
+
+    }
+    return
+}
 /**最好异步执行
  * */
 fun place_schema(pos: Location,schema:File): Boolean {
