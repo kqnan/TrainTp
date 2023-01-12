@@ -52,6 +52,9 @@ class Config {
     fun getBroacast_Timing():Int{
         return config.getInt("broadcast-Timing",0)
     }
+    fun getTitle():String{
+        return config.getString("broadcast-enter","")!!
+    }
     fun getBroacast_range():Double{
         return config.getDouble("broadcast-range",50.0)
     }

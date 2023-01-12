@@ -171,6 +171,28 @@ var editSession:EditSession?=null
 fun Vector.toBukkit(world: World):Location{
     return Location(world,this.x,this.y,this.z)
 }
+fun Region.containPlayer(player: Player):Boolean{
+    var pos1=this.minimumPoint
+    var pos2=this.maximumPoint
+    var pos=Vector(player.location.x,player.location.y,player.location.z)
+    return pos.containedWithin(pos1,pos2)
+
+}
+fun region_schema(world: World,schema: File):Region?{
+    val weWorld = BukkitWorld(world)
+    val clipboard: BlockArrayClipboard
+    val file = schema
+    if (!file.exists()) return null
+    val format = ClipboardFormat.findByFile(file)
+    try {
+        val reader = format!!.getReader(FileInputStream(file))
+        clipboard = reader.read(weWorld.worldData) as BlockArrayClipboard
+        return clipboard.region
+    }catch (e:Exception){
+
+    }
+    return null
+}
 fun particle_schema(world: World,schema: File){
 
     val weWorld = BukkitWorld(world)

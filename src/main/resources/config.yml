@@ -15,7 +15,8 @@ broadcast-range: 50
 broadcast-message: "&a请注意，下一趟列车将在%sec%秒后到达"
 #发送广播的时间间隔,单位：秒
 broadcast-interval: 5
-
+#列车进站时给玩家发送的title
+broadcast-enter: "列车已到达"
 #列车的原理图列表。每次列车到来时，插件将从下表抽取一个列车的原理图来生成。
 trains-schematics: []
 
@@ -25,9 +26,9 @@ debug: false
 #列车出发后运行的命令，一般是把玩家传送到不同地方。不要加/
 commands:
   1:
-    message: "提示:本次列车将到达雪原"
-    cmd: "warp test"
-    chance: 10  #有10%概率发送提示消息
+    message: "提示:本次列车将到达雪原"  #发送的title消息
+    cmd: "warp test"  #运行的命令
+    chance: 10  #有10%概率发送titl提示消息
   2:
     message: "提示：本次列车将到达主城"
     cmd: "spawn"

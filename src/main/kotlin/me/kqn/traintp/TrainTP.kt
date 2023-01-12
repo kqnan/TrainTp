@@ -31,8 +31,6 @@ object TrainTP : Plugin() {
         config= Config()
         registerCommand()
         plugin=BukkitPlugin.getInstance()
-        var p=Bukkit.getPlayer("Kurt_Kong")!!
-
 
     }
 
