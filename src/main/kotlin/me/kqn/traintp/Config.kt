@@ -92,6 +92,9 @@ class Config {
             getBroacast_Timing()
             getBroacast_range()
             getBroacast_message()
+            if(config.getStringList("trains-schematics").isEmpty()){
+                return false
+            }
             config.getStringList("trains-schematics").forEach {
                 if(!File("plugins/TrainTP/schematic/${it}").exists()){
                     return false

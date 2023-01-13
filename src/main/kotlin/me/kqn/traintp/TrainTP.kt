@@ -34,6 +34,16 @@ object TrainTP : Plugin() {
 
     }
 
+    override fun onActive() {
+        if(!config.checkNonNull()){
+            return
+        }
+        else if(trainScheduler==null){
+            var interv= config.getInterval()
+            trainScheduler= TrainScheduler(interv, config.getArea("trainLoc")!!, Pair(config.getArea("pos1")!!, config.getArea("pos2")!!), config.getBroacast_Timing(),broacstInterval=config.getBroadcastInterval(),config.getBroacast_range(), config.getBroacast_message())
+            trainScheduler!!.run()
+        }
+    }
     override fun onDisable() {
         trainScheduler?.stop()
     }
