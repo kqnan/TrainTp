@@ -1,8 +1,10 @@
-# Building
+# TrainTp列车插件
+基于taboolib开发的插件。
 
-* [Gradle](https://gradle.org/) - Dependency Management
+列车将在指定区域以随机的时间间隔出现，玩家靠近列车后会自动登上列车，
+30秒后列车将玩家tp到指定的位置
 
-The GradleWrapper in included in this project.
+
 
 **Windows:**
 
@@ -16,4 +18,3 @@ gradlew.bat clean build
 ./gradlew clean build
 ```
 
-Build artifacts should be found in `./build/libs` folder.
