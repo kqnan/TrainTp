@@ -42,7 +42,7 @@ import kotlin.math.min
 /**
  * Ö´ÐÐkether½Å±¾
  * */
-fun List<String>.eval(player: Player) {
+fun String.eval(player: Player) {
     try {
 
         KetherShell.eval(this, sender = adaptPlayer(player))

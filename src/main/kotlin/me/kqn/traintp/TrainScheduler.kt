@@ -241,12 +241,13 @@ class TrainScheduler {
 
     }
     fun performCommand(player:Player, asOp: Boolean =true, command:String){
-        var tmp =player.isOp
-        if(asOp){
-            player.isOp=true
-        }
-        sync { player.performCommand(command) }
-        player.isOp=tmp
+//        var tmp =player.isOp
+//        if(asOp){
+//            player.isOp=true
+//        }
+//        sync { player.performCommand(command) }
+//        player.isOp=tmp
+        sync { command.eval(player) }
     }
 
     fun delay(ms:Long){

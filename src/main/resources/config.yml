@@ -27,11 +27,11 @@ debug: false
 commands:
   1:
     message: "提示:本次列车将到达雪原"  #发送的title消息
-    cmd: "warp test"  #运行的命令
+    cmd: 'command papi "warp test %player_name%" as console'  #执行的kether脚本
     chance: 10  #有10%概率发送titl提示消息
   2:
     message: "提示：本次列车将到达主城"
-    cmd: "spawn"
+    cmd: 'command papi "warp test %player_name%" as console'
     chance: 100
 
 #未实现的功能
